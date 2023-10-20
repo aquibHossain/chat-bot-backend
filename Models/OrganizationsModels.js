@@ -1,12 +1,9 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 
-const userSchema = new mongoose.Schema(
-    {
+const organizationSchema = new mongoose.Schema(
+    {  
         firstName: {
-            type: String,
-        },
-        lastName: {
             type: String,
         },
         email: {
@@ -15,9 +12,13 @@ const userSchema = new mongoose.Schema(
         password: {
             type: String,
         },
-        admin: {
-            type: Boolean,
-            default: false
+        admins: {
+            type: [String],
+            default:[]
+        },
+        websites: {
+            type: [String],
+            default:[]
         },
     },
     {
@@ -26,11 +27,11 @@ const userSchema = new mongoose.Schema(
 );
 
 
-userSchema.methods.matchPassword = async function (enteredPassword) {
+organizationSchema.methods.matchPassword = async function (enteredPassword) {
     return await bcrypt.compare(enteredPassword, this.password);
 };
 
-userSchema.pre("save", async function (next) {
+organizationSchema.pre("save", async function (next) {
     if (!this.isModified) {
         next();
     }
@@ -46,5 +47,5 @@ userSchema.pre("save", async function (next) {
 });
 
 
-const model = mongoose.model("User", userSchema);
+const model = mongoose.model("organization", organizationSchema);
 module.exports = model;

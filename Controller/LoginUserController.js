@@ -1,6 +1,54 @@
 const User = require("../Models/UserModel");
+const Organization = require("../Models/OrganizationsModels");
 const jwt = require("jsonwebtoken");
 
+exports.registerOrganization = async (req, res) => {
+    try {
+       
+        if (req.body.firstName) {
+
+            const result = await Organization.findOne({ name: req.body.firstName });
+            const result1= await Organization.findOne({ email: req.body.email })
+            if (result) {
+                return res.status(500).json({
+                    message: "This Organization already exists",
+                });
+            }
+            if (result1) {
+                return res.status(500).json({
+                    message: "This Email already exists",
+                });
+            }
+
+            const user = new Organization({
+                firstName: req.body.firstName,
+                email: req.body.email,
+                password: req.body.password,
+            });
+
+            const saveUser = await user.save();
+            res.status(200).json({
+                newUser: {
+                    _id: saveUser._id,
+                },
+                message: "User created successfully.",
+            });
+           }
+    
+        else {
+            return res.status(500).json({
+                message: "Enter All Info",
+            });
+    }
+    }
+    catch (e) {
+        console.error(e.message);
+        res.status(500).json({
+
+            message: "An error occurred while creating user",
+        });
+    }
+}
 exports.register = async (req, res) => {
     try {
        
@@ -85,6 +133,43 @@ exports.login = async (req, res) => {
         res.status(500).json({ message: "An error occurred while logging in" });
     }
 }
+exports.loginOrganization = async (req, res) => {
+    try {
+        const result = await Organization.findOne({ email: req.body.email });
+
+        if (!result) {
+            return res.status(400).json({
+                message: "This User Email does not exist",
+            });
+        }
+        
+
+        const matchPassword = await result.matchPassword(req.body.password);
+
+        if (!matchPassword) {
+            return res.status(400).json({
+                message: "Incorrect password",
+            });
+        }
+
+        const token = jwt.sign({ id: result._id, email: result.email }, process.env.JWT_SECRET, {
+            expiresIn: "24h"
+        });
+
+        res.status(200).json({
+            user: result,
+            token,
+            message: "User Logged in Successfully",
+        });
+
+    }
+
+    catch (e) {
+        console.error(e.message);
+        res.status(500).json({ message: "An error occurred while logging in" });
+    }
+}
+
 exports.loginGoogle = async (req, res) => {
     try {
         let userData = await User.findOne({ email: req.body.email });

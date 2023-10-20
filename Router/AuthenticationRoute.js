@@ -8,14 +8,18 @@ const {
     changePassword,
     currentUser,
     deleteUser,
-    loginGoogle
+    loginGoogle,
+    registerOrganization,
+    loginOrganization
 } = require("../Controller/LoginUserController");
 
 const auth = require("../Middleware/AdminAuthMiddleware");
 
+router.post("/login/organization", loginOrganization);
 router.post("/login", login);
 router.post("/google", loginGoogle);
 router.post("/register", register);
+router.post("/register/organization", registerOrganization);
 router.get("/:id", getUserName);
 router.get("/users/all", getAllUser);
 router.get("/users/currentUser", auth, currentUser);

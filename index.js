@@ -29,6 +29,7 @@ app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 app.use("/api/v1/authentication", require("./Router/AuthenticationRoute"));
 app.use("/api/v1/conversation", require("./Router/ConversationRoute"));
 
+const onlineUsers = new Map();
 
 global.io.on('connection', (socket) => {
     console.log('A user connected');
@@ -38,8 +39,29 @@ global.io.on('connection', (socket) => {
       io.emit('new_message', message); // Broadcast the message to all connected clients
     });
   
+    // Listen for a "userOnline" event when a user connects
+    socket.on('userOnline', (userId) => {
+      // Add the user to the onlineUsers map
+      onlineUsers.set(userId, socket.id);
+  
+      // Broadcast the updated online users list to all clients
+      io.emit('updateOnlineUsers', Array.from(onlineUsers.keys()));
+
+    });
+  
+    socket.on('adminUser', (userId) => {
+      console.log('Received message:', userId);
+      io.emit('adminUser', Array.from(onlineUsers.keys())); // Broadcast the message to all connected clients
+    });
+  
     socket.on('disconnect', () => {
       console.log('A user disconnected');
+          // Remove the user from the onlineUsers map
+    const userId = Array.from(onlineUsers.keys()).find(key => onlineUsers.get(key) === socket.id);
+    onlineUsers.delete(userId);
+
+    // Broadcast the updated online users list to all clients
+    io.emit('updateOnlineUsers', Array.from(onlineUsers.keys()));
     });
   });
 
