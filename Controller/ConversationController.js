@@ -31,6 +31,35 @@ exports.createConversation = async (req, res) => {
     }
 }
 
+exports.createConversationwithUser = async (req, res) => {
+    try {
+        // const user = await User.findOne({ email: req.body.userEmail })
+        const user2 = await User.findOne({ email: req.body.receiverEmail })
+        
+      
+
+        const newConversation = new Conversation({
+            creator: {
+                name: req.body.userEmail,
+                avatar: "",
+                email: req.body.userEmail
+            },
+            participant:{
+                name: user2.firstName,
+                avatar: "",
+                email:user2.email
+            },
+          });
+      
+          // Save the conversation to the database
+          const savedConversation = await newConversation.save();
+          res.status(201).json(savedConversation);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'An error occurred while creating the conversation' });0
+    }
+}
+
 exports.getConversation = async (req, res) => {
     try {
 
@@ -112,7 +141,7 @@ exports.sendMessage = async (req, res) => {
             })
 
             }
-
+console.log(req.body.message)
             const newMessage = new Message({
                 text: req.body.message,
                 attachment: attachment,

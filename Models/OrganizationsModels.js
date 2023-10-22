@@ -12,14 +12,18 @@ const organizationSchema = new mongoose.Schema(
         password: {
             type: String,
         },
-        admins: {
+        admins: 
+            {
             type: [String],
-            default:[]
-        },
-        websites: {
-            type: [String],
-            default:[]
-        },
+                default:[]
+            }
+        ,
+        websites: [
+            {
+                name: String,
+                link:String
+            }
+        ],
     },
     {
         timestamps: true,

@@ -275,7 +275,23 @@ exports.currentUser = async (req, res) => {
         const user = await User.findById(req.user._id).select("-password");
         res.status(200).json({
             message: "Get user successfully",
-            user
+            user:user?user:organization
+        });
+    }
+    catch (e) {
+        res.status(500).json({
+            message: "An error occurred while get user",
+        });
+    }
+}
+exports.currentUserOrg = async (req, res) => {
+    try {
+       
+        const user = await Organization.findById(req.user._id).select("-password");
+        
+        res.status(200).json({
+            message: "Get user successfully",
+            user:user?user:organization
         });
     }
     catch (e) {

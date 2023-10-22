@@ -5,10 +5,12 @@ const {
     getConversation,
     getInbox,
     getMessages,
-    sendMessage
+    sendMessage,
+    createConversationwithUser
 } = require("../Controller/ConversationController");
 
 router.post('/', createConversation)
+router.post('/user', createConversationwithUser)
 router.get("/",getConversation)
 router.post("/inbox",getInbox)
 router.get("/messages/:conversation_id",getMessages)

@@ -28,6 +28,7 @@ app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 
 app.use("/api/v1/authentication", require("./Router/AuthenticationRoute"));
 app.use("/api/v1/conversation", require("./Router/ConversationRoute"));
+app.use("/api/v1/admin", require("./Router/AdminRoute"));
 
 const onlineUsers = new Map();
 
@@ -49,10 +50,12 @@ global.io.on('connection', (socket) => {
 
     });
   
-    socket.on('adminUser', (userId) => {
-      console.log('Received message:', userId);
-      io.emit('adminUser', Array.from(onlineUsers.keys())); // Broadcast the message to all connected clients
-    });
+   
+  socket.on('adminUser', res => {
+    console.log(res)
+        io.emit('getAdmin',Array.from(onlineUsers.keys()))
+      }); // Broadcast the message to all connected clients
+  
   
     socket.on('disconnect', () => {
       console.log('A user disconnected');
