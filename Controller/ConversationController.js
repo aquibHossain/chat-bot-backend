@@ -1,5 +1,6 @@
 const Conversation=require("../Models/ConversationModel")
 const User = require("../Models/UserModel");
+const WebsiteUser = require("../Models/UserInformationModal");
 const Message = require("../Models/MessagesModel");
 
 exports.createConversation = async (req, res) => {
@@ -27,22 +28,30 @@ exports.createConversation = async (req, res) => {
           res.status(201).json(savedConversation);
     } catch (error) {
         console.error(error);
-        res.status(500).json({ error: 'An error occurred while creating the conversation' });0
+        res.status(500).json({ error: 'An error occurred while creating the conversation' });
     }
 }
 
 exports.createConversationwithUser = async (req, res) => {
     try {
-        // const user = await User.findOne({ email: req.body.userEmail })
-        const user2 = await User.findOne({ email: req.body.receiverEmail })
-        
-      
+        const user = await WebsiteUser.findOne({ email: req.body.userEmail })
 
+        const user2 = await User.findOne({ email: req.body.receiverEmail })
+
+        const conversationExist = await Conversation.findOne({
+                 "creator.email": req.body.userEmail ,
+                "participant.email":req.body.receiverEmail
+            })
+console.log(conversationExist)
+        if (conversationExist) {
+          return  res.status(200).json(conversationExist);
+}
+     
         const newConversation = new Conversation({
             creator: {
-                name: req.body.userEmail,
+                name: user.firstName,
                 avatar: "",
-                email: req.body.userEmail
+                email: user.email
             },
             participant:{
                 name: user2.firstName,
@@ -86,6 +95,20 @@ exports.getInbox = async (req, res) => {
                 {"participant.email":req.body.email}
             ]
         })
+
+        res.status(200).json({
+            conversation
+        });
+    }
+    catch (e) {
+        console.error(e.message);
+        res.status(500).json({ message: "An error occurred while getting data" });
+    }
+}
+exports.deleteAllConversation = async (req, res) => {
+    try {
+   
+        const conversation = await Conversation.deleteMany({})
 
         res.status(200).json({
             conversation

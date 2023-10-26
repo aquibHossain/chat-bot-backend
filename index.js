@@ -27,6 +27,7 @@ app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 
 app.use("/api/v1/authentication", require("./Router/AuthenticationRoute"));
+app.use("/api/v1/users", require("./Router/UserRoute"));
 app.use("/api/v1/conversation", require("./Router/ConversationRoute"));
 app.use("/api/v1/admin", require("./Router/AdminRoute"));
 
@@ -35,10 +36,7 @@ const onlineUsers = new Map();
 global.io.on('connection', (socket) => {
     console.log('A user connected');
   
-    socket.on('new_message', (message) => {
-      console.log('Received message:', message);
-      io.emit('new_message', message); // Broadcast the message to all connected clients
-    });
+  
   
     // Listen for a "userOnline" event when a user connects
     socket.on('userOnline', (userId) => {
@@ -51,11 +49,15 @@ global.io.on('connection', (socket) => {
     });
   
    
-  socket.on('adminUser', res => {
-    console.log(res)
-        io.emit('getAdmin',Array.from(onlineUsers.keys()))
-      }); // Broadcast the message to all connected clients
+  // socket.on('adminUser', res => {
+  //   console.log(res)
+  //       io.emit('getAdmin',Array.from(onlineUsers.keys()))
+  //     }); // Broadcast the message to all connected clients
   
+      socket.on('new_message', (message) => {
+        console.log('Received message:', message);
+        io.emit('new_message', message); // Broadcast the message to all connected clients
+      });
   
     socket.on('disconnect', () => {
       console.log('A user disconnected');

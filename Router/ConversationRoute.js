@@ -6,7 +6,8 @@ const {
     getInbox,
     getMessages,
     sendMessage,
-    createConversationwithUser
+    createConversationwithUser,
+    deleteAllConversation
 } = require("../Controller/ConversationController");
 
 router.post('/', createConversation)
@@ -15,5 +16,6 @@ router.get("/",getConversation)
 router.post("/inbox",getInbox)
 router.get("/messages/:conversation_id",getMessages)
 router.post("/messages/send", sendMessage)
+router.delete("/all",deleteAllConversation)
 
 module.exports = router;
